@@ -1,0 +1,116 @@
+/* #e27d60
+   #85dcb0
+   #e8a87c
+   #c38d9e
+   #41b3a3 */
+
+body {
+  background-image: linear-gradient(to right, #e8a87c 0%, #c38d9e 100%);
+  font-size: 1.5rem;
+  color: white;
+  font-family: "Trebuchet MS", Helvetica, sans-serif;
+}
+
+header {
+  color: #ffd4dd;
+  display: flex;
+  justify-content: center;
+  flex-basis: 50%;
+  align-items: flex-start;
+}
+
+form {
+  display: flex;
+  justify-content: center;
+  flex-basis: 50%;
+  align-items: flex-start;
+}
+.habit-input {
+  height: 20px;
+  margin: 6px;
+  border-radius: 25px;
+  border: 2px solid #c38d9e;
+}
+input:focus {
+  outline: none;
+}
+
+.flex {
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.scroll-left {
+  background-color: rgba(255, 255, 255, 0);
+  margin-left: auto;
+  margin-right: 0;
+  margin-top: 10px;
+  width: 50px;
+  height: 50px;
+  font-size: 3rem;
+  color: white;
+  border-color: rgba(255, 255, 255, 0);
+}
+.scroll-right {
+  background-color: rgba(255, 255, 255, 0);
+  margin-left: 0;
+  margin-right: auto;
+  margin-top: 10px;
+  width: 50px;
+  height: 50px;
+  font-size: 3rem;
+  color: white;
+  border-color: rgba(255, 255, 255, 0);
+}
+.habit-button {
+  height: 27px;
+  margin: 6px;
+  border-radius: 7px;
+  font-size: 1.3rem;
+  background: white;
+  border: 2px solid #c38d9e;
+  color: #c38d9e;
+}
+
+.habit-table {
+  margin-left: 40px;
+  margin-right: 40px;
+}
+
+.habit-table thead tr th {
+  padding: 10px;
+  width: 100px;
+  border: 2px solid white;
+}
+.habit-name-cell {
+  border: 2px solid white;
+  width: 120px;
+  height: 50px;
+  text-align: center;
+}
+
+.habit-tracker-cell-0 {
+  background-color: white;
+  width: 122px;
+  border: 2px solid white;
+}
+.habit-tracker-cell-1 {
+  background-color: #91ce94;
+  width: 122px;
+  border: 2px solid white;
+}
+.habit-tracker-cell-2 {
+  background-color: #41db74;
+  width: 122px;
+  border: 2px solid white;
+}
+.habit-tracker-cell-3 {
+  background-color: rgb(15, 185, 80);
+  width: 122px;
+  border: 2px solid white;
+}
+
+#current-day {
+  border: 2px solid #5ce7d5;
+}
