@@ -7,6 +7,8 @@ function App() {
 
   const [inputText, setInputText] = useState("");
   const [currentDay, setCurrentDay] = useState(new Date());
+  const [deletedHabits, setDeletedHabits] = useState([]);
+  const [isUndoEnabled, setUndoEnabled] = useState(false);
   const [habits, setHabits] = useState(
     localStorage.getItem("habits")
       ? JSON.parse(localStorage.getItem("habits"))
@@ -69,7 +71,7 @@ function App() {
     let week = getWeek(currentDay);
 
     for (var i in newHabits) {
-      if (newHabits[i].name == name) {
+      if (newHabits[i].name === name) {
         newHabits[i].tracker[week][index] =
           (newHabits[i].tracker[week][index] + 1) % 4;
 
@@ -78,6 +80,18 @@ function App() {
     }
 
     setHabits(newHabits);
+  }
+
+  function onUndo() {
+    if (!isUndoEnabled) return;
+    let newHabits = [...habits];
+    let newDeletedHabits = [...deletedHabits];
+
+    newHabits.push(newDeletedHabits.pop());
+    if (newDeletedHabits.length == 0) setUndoEnabled(false);
+
+    setHabits(newHabits);
+    setDeletedHabits(newDeletedHabits);
   }
 
   const saveLocalHabits = () => {
@@ -98,14 +112,17 @@ function App() {
 
   function onDelete(name) {
     let newHabits = [...habits];
+    let newDeletedHabits = [...deletedHabits];
     for (var i in newHabits) {
-      if (newHabits[i].name == name) {
+      if (newHabits[i].name === name) {
+        newDeletedHabits.push(newHabits[i]);
         newHabits.splice(i, 1);
         break;
       }
     }
-
+    setDeletedHabits(newDeletedHabits);
     setHabits(newHabits);
+    setUndoEnabled(true);
   }
   return (
     <div>
@@ -122,6 +139,8 @@ function App() {
         onCellClick={onCellClick}
         getWeek={getWeek}
         onDelete={onDelete}
+        isUndoEnabled={isUndoEnabled}
+        onUndo={onUndo}
       />
     </div>
   );
