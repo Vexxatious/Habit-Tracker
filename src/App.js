@@ -2,6 +2,7 @@ import "./App.css";
 import Form from "./components/Form";
 import Table from "./components/Table";
 import React, { useState, useEffect } from "react";
+
 function App() {
   let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -127,7 +128,7 @@ function App() {
   return (
     <div>
       <header>
-        <h1>Habit Tracker</h1>
+        <h1>Simple Habit Tracker</h1>
       </header>
       <Form onSubmit={onSubmit} setInputText={setInputText} />
       <Table
