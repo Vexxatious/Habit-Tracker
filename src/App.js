@@ -2,20 +2,42 @@ import "./App.css";
 import Form from "./components/Form";
 import Table from "./components/Table";
 import React, { useState, useEffect } from "react";
+import firebase from "firebase/compat/app";
+import "firebase/compat/auth";
+import "firebase/compat/firestore";
+import SignIn from "./components/SignIn";
+import { useAuthState } from "react-firebase-hooks/auth";
+import { useCollectionData } from "react-firebase-hooks/firestore";
+import SignOut from "./components/SignOut";
+import { disableNetwork, doc } from "firebase/firestore";
+
+firebase.initializeApp({
+  apiKey: "AIzaSyDEMAFLn5R4ATMtMe0a3GTrzP2cM2gXGmk",
+  authDomain: "habit-tracker-d0509.firebaseapp.com",
+  projectId: "habit-tracker-d0509",
+  storageBucket: "habit-tracker-d0509.appspot.com",
+  messagingSenderId: "246770081392",
+  appId: "1:246770081392:web:fce8813be2797da41b1eb5",
+  measurementId: "G-TJY51B5W6F",
+});
+
+const auth = firebase.auth();
+const db = firebase.firestore();
 
 function App() {
   let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-
+  const [user] = useAuthState(auth);
   const [inputText, setInputText] = useState("");
   const [currentDay, setCurrentDay] = useState(new Date());
   const [deletedHabits, setDeletedHabits] = useState([]);
   const [isUndoEnabled, setUndoEnabled] = useState(false);
-  const [habits, setHabits] = useState(
+  const [habits, setHabits] = useState([]);
+  /*
     localStorage.getItem("habits")
       ? JSON.parse(localStorage.getItem("habits"))
       : [{ name: "Gym", tracker: createNewTracker(), key: 0 }]
   );
-
+*/
   function onSubmit(e) {
     e.preventDefault();
     addHabit(inputText);
@@ -53,12 +75,15 @@ function App() {
   }
 
   function addHabit(name) {
-    let newHabits = [
-      ...habits,
-      { name: name, tracker: createNewTracker(), key: habits.length },
-    ];
+    let newHabits = [...habits];
+    let newHabit = {
+      name: name,
+    };
+    createNewTracker().map((tracker, index) => (newHabit[index] = tracker));
+    newHabits.push(newHabit);
+    db.collection(user.uid).add(newHabit);
+
     setHabits(newHabits);
-    return habits[name];
   }
 
   function scrollDate(i) {
@@ -67,15 +92,16 @@ function App() {
     if (getWeek(newDate) > 0) setCurrentDay(newDate);
   }
 
-  function onCellClick(name, index) {
+  function onCellClick(habit, index) {
     let newHabits = [...habits];
     let week = getWeek(currentDay);
 
     for (var i in newHabits) {
-      if (newHabits[i].name === name) {
-        newHabits[i].tracker[week][index] =
-          (newHabits[i].tracker[week][index] + 1) % 4;
-
+      if (newHabits[i].name === habit.name) {
+        newHabits[i][week][index] = (newHabits[i][week][index] + 1) % 4;
+        db.collection(user.uid)
+          .doc(habit.key)
+          .update({ [week]: newHabits[i][week] });
         break;
       }
     }
@@ -88,20 +114,26 @@ function App() {
     let newHabits = [...habits];
     let newDeletedHabits = [...deletedHabits];
 
-    newHabits.push(newDeletedHabits.pop());
+    let undodHabit = newDeletedHabits.pop();
+    newHabits.push(undodHabit);
+    db.collection(user.uid).add(undodHabit);
     if (newDeletedHabits.length == 0) setUndoEnabled(false);
 
     setHabits(newHabits);
     setDeletedHabits(newDeletedHabits);
   }
 
-  const saveLocalHabits = () => {
-    localStorage.setItem("habits", JSON.stringify(habits));
-  };
-
   useEffect(() => {
-    saveLocalHabits();
-  }, [habits]);
+    if (!user) return;
+    db.collection(user.uid).onSnapshot((snapshot) => {
+      const newHabits = snapshot.docs.map((doc) => ({
+        key: doc.id,
+        ...doc.data(),
+      }));
+
+      setHabits(newHabits);
+    });
+  }, [user]);
 
   function getWeek(date) {
     var onejan = new Date(date.getFullYear(), 0, 1);
@@ -111,18 +143,20 @@ function App() {
     );
   }
 
-  function onDelete(name) {
+  function onDelete(habit) {
     let newHabits = [...habits];
     let newDeletedHabits = [...deletedHabits];
     for (var i in newHabits) {
-      if (newHabits[i].name === name) {
+      if (newHabits[i].name === habit.name) {
         newDeletedHabits.push(newHabits[i]);
         newHabits.splice(i, 1);
         break;
       }
     }
-    setDeletedHabits(newDeletedHabits);
+    db.collection(user.uid).doc(habit.key).delete();
+
     setHabits(newHabits);
+    setDeletedHabits(newDeletedHabits);
     setUndoEnabled(true);
   }
   return (
@@ -130,19 +164,30 @@ function App() {
       <header>
         <h1>Simple Habit Tracker</h1>
       </header>
-      <Form onSubmit={onSubmit} setInputText={setInputText} />
-      <Table
-        scrollDate={scrollDate}
-        currentDay={currentDay}
-        days={days}
-        getDate={getDate}
-        habits={habits}
-        onCellClick={onCellClick}
-        getWeek={getWeek}
-        onDelete={onDelete}
-        isUndoEnabled={isUndoEnabled}
-        onUndo={onUndo}
-      />
+      <section>
+        {user ? (
+          <div>
+            <Form onSubmit={onSubmit} setInputText={setInputText} />
+            <Table
+              scrollDate={scrollDate}
+              currentDay={currentDay}
+              days={days}
+              getDate={getDate}
+              habits={habits}
+              onCellClick={onCellClick}
+              getWeek={getWeek}
+              onDelete={onDelete}
+              isUndoEnabled={isUndoEnabled}
+              onUndo={onUndo}
+            />
+            <SignOut auth={auth} />
+          </div>
+        ) : (
+          <div className="flex">
+            <SignIn auth={auth} />
+          </div>
+        )}
+      </section>
     </div>
   );
 }

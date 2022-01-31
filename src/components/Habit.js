@@ -1,19 +1,19 @@
 import React from "react";
 
-const Habit = ({ name, tracker, onCellClick, week, onDelete }) => {
+const Habit = ({ habit, week, onCellClick, onDelete }) => {
   return (
     <tr>
-      <td className="habit-name-cell">{name}</td>
-      {tracker[week].map((value, index) => (
+      <td className="habit-name-cell">{habit.name}</td>
+      {habit[week].map((value, index) => (
         <td
           className={"habit-tracker-cell-" + value}
           key={index}
-          onClick={() => onCellClick(name, index)}
+          onClick={() => onCellClick(habit, index)}
         ></td>
       ))}
 
       <td>
-        <form type="button" onClick={() => onDelete(name)}>
+        <form type="button" onClick={() => onDelete(habit)}>
           <i className="fa fa-trash-o"></i>
         </form>
       </td>
