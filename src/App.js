@@ -116,6 +116,7 @@ function App() {
 
     let undodHabit = newDeletedHabits.pop();
     newHabits.push(undodHabit);
+    delete undodHabit["key"];
     db.collection(user.uid).add(undodHabit);
     if (newDeletedHabits.length == 0) setUndoEnabled(false);
 
