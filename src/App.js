@@ -32,17 +32,18 @@ function App() {
   const [deletedHabits, setDeletedHabits] = useState([]);
   const [isUndoEnabled, setUndoEnabled] = useState(false);
   const [habits, setHabits] = useState([]);
-  /*
-    localStorage.getItem("habits")
-      ? JSON.parse(localStorage.getItem("habits"))
-      : [{ name: "Gym", tracker: createNewTracker(), key: 0 }]
-  );
-*/
+  const [weeksShown, setWeeksShown] = useState(3);
+
   function onSubmit(e) {
     e.preventDefault();
     addHabit(inputText);
     setInputText("");
     document.getElementById("habit-input").value = "";
+  }
+
+  function onWeekSelect(e) {
+    db.collection(user.uid).doc("settings").update({ weeks: e.target.value });
+    setWeeksShown(Number(e.target.value));
   }
 
   function createNewTracker() {
@@ -126,12 +127,20 @@ function App() {
 
   useEffect(() => {
     if (!user) return;
+    var settings = null;
     db.collection(user.uid).onSnapshot((snapshot) => {
-      const newHabits = snapshot.docs.map((doc) => ({
+      let newHabits = snapshot.docs.map((doc) => ({
         key: doc.id,
         ...doc.data(),
       }));
 
+      settings = newHabits.find((habit) => habit.key == "settings");
+      if (settings) {
+        setWeeksShown(Number(settings.weeks));
+      } else {
+        db.collection(user.uid).doc("settings").set({ weeks: 1 });
+      }
+      newHabits = newHabits.filter((habit) => habit.key != "settings");
       setHabits(newHabits);
     });
   }, [user]);
@@ -168,7 +177,14 @@ function App() {
       <section>
         {user ? (
           <div>
-            <Form onSubmit={onSubmit} setInputText={setInputText} />
+            <div className="flex">
+              <Form
+                onSubmit={onSubmit}
+                setInputText={setInputText}
+                onWeekSelect={onWeekSelect}
+                shownWeeks={weeksShown}
+              />
+            </div>
             <Table
               scrollDate={scrollDate}
               currentDay={currentDay}
@@ -180,6 +196,7 @@ function App() {
               onDelete={onDelete}
               isUndoEnabled={isUndoEnabled}
               onUndo={onUndo}
+              weeksShown={weeksShown}
             />
             <SignOut auth={auth} />
           </div>

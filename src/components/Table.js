@@ -12,6 +12,7 @@ const Table = ({
   onDelete,
   isUndoEnabled,
   onUndo,
+  weeksShown,
 }) => {
   return (
     <div>
@@ -20,25 +21,27 @@ const Table = ({
           &lt;
         </button>
         <table className="habit-table">
-          <thead>
-            <tr>
-              <th> </th>
-              {days.map((day, index) => (
-                <th
-                  id={index == currentDay.getDay() ? "current-day" : ""}
-                  key={index}
-                >
-                  {day} <br /> {getDate(index - currentDay.getDay())}
-                </th>
-              ))}
-            </tr>
-          </thead>
           <tbody>
+            <tr className="table-head">
+              <th> </th>
+              {new Array(weeksShown)
+                .fill(days)
+                .flat()
+                .map((day, index) => (
+                  <th
+                    id={index == currentDay.getDay() ? "current-day" : ""}
+                    key={index}
+                  >
+                    {day} <br /> {getDate(index - currentDay.getDay())}
+                  </th>
+                ))}
+            </tr>
             <HabitList
               habits={habits}
               onCellClick={onCellClick}
               week={getWeek(currentDay)}
               onDelete={onDelete}
+              weeksShown={weeksShown}
             />
           </tbody>
         </table>

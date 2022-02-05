@@ -1,7 +1,7 @@
 import React from "react";
 import Habit from "./Habit";
 
-const HabitList = ({ habits, onCellClick, week, onDelete }) => {
+const HabitList = ({ habits, onCellClick, week, onDelete, weeksShown }) => {
   return (
     <React.Fragment>
       {habits ? (
@@ -12,6 +12,7 @@ const HabitList = ({ habits, onCellClick, week, onDelete }) => {
             onCellClick={onCellClick}
             week={week}
             onDelete={onDelete}
+            weeksShown={weeksShown}
           />
         ))
       ) : (

@@ -20,15 +20,32 @@ header {
   align-items: flex-start;
 }
 
-form {
+label {
+  font-size: 1.2rem;
+}
+.flex {
   display: flex;
   justify-content: center;
-  flex-basis: 50%;
+  align-items: center;
+}
+form {
+  left: 50%;
+  display: flex;
+  justify-content: flex-start;
   align-items: flex-start;
+  flex-direction: column;
 }
 .habit-input {
   height: 20px;
-  margin: 6px;
+  margin: 5px 5px 10px 5px;
+  border-radius: 25px;
+  border: 2px solid #c38d9e;
+}
+
+.habit-select {
+  height: 25px;
+  width: 40px;
+  margin: 7px;
   border-radius: 25px;
   border: 2px solid #c38d9e;
 }
@@ -73,8 +90,7 @@ input:focus {
   border-color: rgba(255, 255, 255, 0);
 }
 .habit-button {
-  height: 27px;
-  margin: 6px;
+  height: 30px;
   border-radius: 7px;
   font-size: 1.3rem;
   background: white;
@@ -83,11 +99,14 @@ input:focus {
 }
 
 .habit-table {
+  display: grid;
+  grid-template-columns: 100%;
+
   margin-left: 40px;
   margin-right: 40px;
 }
 
-.habit-table thead tr th {
+.table-head th {
   padding: 10px;
   width: 100px;
   border: 2px solid white;
