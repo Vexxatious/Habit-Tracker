@@ -29,7 +29,12 @@ const Table = ({
                 .flat()
                 .map((day, index) => (
                   <th
-                    id={index == currentDay.getDay() ? "current-day" : ""}
+                    id={
+                      getDate(index - currentDay.getDay()) ==
+                      getDate(0, new Date())
+                        ? "current-day"
+                        : ""
+                    }
                     key={index}
                   >
                     {day} <br /> {getDate(index - currentDay.getDay())}
@@ -51,7 +56,7 @@ const Table = ({
       </div>
       <div>
         <i
-          className="fa fa-refresh center fa-lg"
+          className="fas fa-undo center fa-lg"
           id={isUndoEnabled ? "" : "undo-disabled"}
           onClick={onUndo}
         ></i>
