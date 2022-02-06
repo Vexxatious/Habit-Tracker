@@ -28,7 +28,7 @@ function App() {
   let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const [user] = useAuthState(auth);
   const [inputText, setInputText] = useState("");
-  const [currentDay, setCurrentDay] = useState(new Date());
+  const [currentDay, setCurrentDay] = useState(getFirstSunday());
   const [deletedHabits, setDeletedHabits] = useState([]);
   const [isUndoEnabled, setUndoEnabled] = useState(false);
   const [habits, setHabits] = useState([]);
@@ -53,7 +53,18 @@ function App() {
     }
     return tracker;
   }
-  function getDate(offset) {
+
+  function getFirstSunday() {
+    var td = new Date();
+    var y = td.getFullYear();
+    var m = td.getMonth();
+    var FirstDay = new Date(y, m, 1);
+    while (FirstDay.getDay() != 0) FirstDay.setDate(FirstDay.getDate() - 1);
+
+    return FirstDay;
+  }
+
+  function getDate(offset, startDay = currentDay) {
     const monthNames = [
       "Jan",
       "Feb",
@@ -68,7 +79,7 @@ function App() {
       "Nov",
       "Dec",
     ];
-    let date = new Date(currentDay.valueOf());
+    let date = new Date(startDay.valueOf());
     date.setDate(date.getDate() + offset);
     const month = monthNames[date.getMonth()];
     const day = String(date.getDate()).padStart(2, "0");
@@ -97,12 +108,15 @@ function App() {
     let newHabits = [...habits];
     let week = getWeek(currentDay);
 
+    let weekOffset = Math.floor(index / 7);
+    let day = index % 7;
     for (var i in newHabits) {
       if (newHabits[i].name === habit.name) {
-        newHabits[i][week][index] = (newHabits[i][week][index] + 1) % 4;
+        newHabits[i][week + weekOffset][day] =
+          (newHabits[i][week + weekOffset][day] + 1) % 4;
         db.collection(user.uid)
           .doc(habit.key)
-          .update({ [week]: newHabits[i][week] });
+          .update({ [week + weekOffset]: newHabits[i][week + weekOffset] });
         break;
       }
     }
