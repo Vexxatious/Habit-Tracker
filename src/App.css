@@ -99,7 +99,6 @@ input:focus {
 }
 
 .habit-table {
-  display: grid;
   grid-template-columns: 100%;
 
   margin-left: 40px;
@@ -197,4 +196,8 @@ input:focus {
 }
 .logout-button:hover {
   background: #8f2828;
+}
+
+.tableDisplay {
+  display: table;
 }

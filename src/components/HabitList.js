@@ -5,7 +5,7 @@ const HabitList = ({ habits, onCellClick, week, onDelete, weeksShown }) => {
   return (
     <React.Fragment>
       {habits ? (
-        habits.map((h) => (
+        habits.map((h, index) => (
           <Habit
             habit={h}
             key={h.key}
@@ -13,6 +13,7 @@ const HabitList = ({ habits, onCellClick, week, onDelete, weeksShown }) => {
             week={week}
             onDelete={onDelete}
             weeksShown={weeksShown}
+            index={index}
           />
         ))
       ) : (

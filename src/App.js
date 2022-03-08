@@ -10,6 +10,7 @@ import { useAuthState } from "react-firebase-hooks/auth";
 import { useCollectionData } from "react-firebase-hooks/firestore";
 import SignOut from "./components/SignOut";
 import { disableNetwork, doc } from "firebase/firestore";
+import Habit from "./components/Habit";
 
 firebase.initializeApp({
   apiKey: "AIzaSyDEMAFLn5R4ATMtMe0a3GTrzP2cM2gXGmk",
@@ -90,6 +91,7 @@ function App() {
     let newHabits = [...habits];
     let newHabit = {
       name: name,
+      index: habits.length + 1,
     };
     createNewTracker().map((tracker, index) => (newHabit[index] = tracker));
     newHabits.push(newHabit);
@@ -148,13 +150,24 @@ function App() {
         ...doc.data(),
       }));
 
+      newHabits.forEach((habit, index) => {
+        if (!habit.index) {
+          db.collection(user.uid)
+            .doc(habit.key)
+            .update({ index: index + 1 });
+        }
+      });
+
       settings = newHabits.find((habit) => habit.key == "settings");
       if (settings) {
         setWeeksShown(Number(settings.weeks));
       } else {
         db.collection(user.uid).doc("settings").set({ weeks: 1 });
       }
+
       newHabits = newHabits.filter((habit) => habit.key != "settings");
+
+      newHabits.sort((a, b) => (a.index > b.index ? 1 : -1));
       setHabits(newHabits);
     });
   }, [user]);
@@ -167,6 +180,19 @@ function App() {
     );
   }
 
+  function onDragEnd(e) {
+    var newHabits = [...habits];
+    var [movedHabit] = newHabits.splice(e.source.index, 1);
+    newHabits.splice(e.destination.index, 0, movedHabit);
+    newHabits.forEach((habit, index) => {
+      habit.index = index + 1;
+      db.collection(user.uid).doc(habit.key).update(habit);
+    });
+
+    debugger;
+    newHabits.sort((a, b) => (a.index > b.index ? 1 : -1));
+    setHabits(newHabits);
+  }
   function onDelete(habit) {
     let newHabits = [...habits];
     let newDeletedHabits = [...deletedHabits];
@@ -211,6 +237,7 @@ function App() {
               isUndoEnabled={isUndoEnabled}
               onUndo={onUndo}
               weeksShown={weeksShown}
+              onDragEnd={onDragEnd}
             />
             <SignOut auth={auth} />
           </div>
