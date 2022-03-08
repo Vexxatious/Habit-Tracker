@@ -18,30 +18,46 @@ const Habit = ({ habit, week, onCellClick, onDelete, weeksShown, index }) => {
       index={index}
       className="tableDisplay"
     >
-      {(provided) => (
-        <tr {...provided.draggableProps} ref={provided.innerRef}>
-          <td className="habit-name-cell">{habit.name}</td>
-          {getWeeks().map((value, index) => (
-            <td
-              className={"habit-tracker-cell-" + value}
-              key={index}
-              onClick={() => onCellClick(habit, index)}
-            ></td>
-          ))}
+      {(provided, snapshot) => {
+        let transform = provided.draggableProps.style.transform;
 
-          <td>
-            <form type="button" onClick={() => onDelete(habit)}>
-              <i className="fa fa-trash-o"></i>
-            </form>
-          </td>
+        if (snapshot.isDragging && transform) {
+          transform = transform.replace(/\(.+\,/, "(0,");
+        }
 
-          <td {...provided.dragHandleProps}>
-            <form type="button" style={{ marginLeft: 10 + "px" }}>
-              <i className="fas fa-arrows-alt-v"></i>
-            </form>
-          </td>
-        </tr>
-      )}
+        const style = {
+          ...provided.draggableProps.style,
+          transform,
+        };
+        return (
+          <tr
+            {...provided.draggableProps}
+            ref={provided.innerRef}
+            style={style}
+          >
+            <td className="habit-name-cell">{habit.name}</td>
+            {getWeeks().map((value, index) => (
+              <td
+                className={"habit-tracker-cell-" + value}
+                key={index}
+                onClick={() => onCellClick(habit, index)}
+              ></td>
+            ))}
+
+            <td>
+              <form type="button" onClick={() => onDelete(habit)}>
+                <i className="fa fa-trash-o"></i>
+              </form>
+            </td>
+
+            <td {...provided.dragHandleProps}>
+              <form type="button" style={{ marginLeft: 10 + "px" }}>
+                <i className="fas fa-arrows-alt-v"></i>
+              </form>
+            </td>
+          </tr>
+        );
+      }}
     </Draggable>
   );
 };
