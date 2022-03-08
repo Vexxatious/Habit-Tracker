@@ -29,11 +29,11 @@ function App() {
   let days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const [user] = useAuthState(auth);
   const [inputText, setInputText] = useState("");
-  const [currentDay, setCurrentDay] = useState(getFirstSunday());
+  const [weeksShown, setWeeksShown] = useState(3);
+  const [currentDay, setCurrentDay] = useState(new Date());
   const [deletedHabits, setDeletedHabits] = useState([]);
   const [isUndoEnabled, setUndoEnabled] = useState(false);
   const [habits, setHabits] = useState([]);
-  const [weeksShown, setWeeksShown] = useState(3);
 
   function onSubmit(e) {
     e.preventDefault();
@@ -55,14 +55,12 @@ function App() {
     return tracker;
   }
 
-  function getFirstSunday() {
+  function getFirstSunday(offset) {
     var td = new Date();
-    var y = td.getFullYear();
-    var m = td.getMonth();
-    var FirstDay = new Date(y, m, 1);
-    while (FirstDay.getDay() != 0) FirstDay.setDate(FirstDay.getDate() - 1);
+    td.setDate(td.getDate() - 7 * (offset - 1));
+    while (td.getDay() != 0) td.setDate(td.getDate() - 1);
 
-    return FirstDay;
+    return td;
   }
 
   function getDate(offset, startDay = currentDay) {
@@ -161,6 +159,7 @@ function App() {
       settings = newHabits.find((habit) => habit.key == "settings");
       if (settings) {
         setWeeksShown(Number(settings.weeks));
+        setCurrentDay(getFirstSunday(Number(settings.weeks)));
       } else {
         db.collection(user.uid).doc("settings").set({ weeks: 1 });
       }
